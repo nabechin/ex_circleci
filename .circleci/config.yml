@@ -19,7 +19,7 @@ commands:
                 name: "change owner of package directory"
                 command: |
                     sudo chown -R circleci:circleci /usr/local/bin
-                    sudo chown -R circleci:ciecleci /usr/local/lib/python3.7/site-packages
+                    sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
     restore_package:
         description: "read cached packeage"
         steps:
