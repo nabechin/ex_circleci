@@ -6,7 +6,7 @@ executors:
         working_directory: ~/ex_circleci
         docker:
             - image: circleci/python:3.7.7
-            environment:
+              environment:
                 PYTHONDONTWRITEBYTECODE: 1
                 PYTHONUNBUFFERED : 1
                 TZ: Asia/Tokyo
