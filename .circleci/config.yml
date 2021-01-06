@@ -1,0 +1,66 @@
+version: 2.1
+description: 'python code test'
+
+executors:
+    code_test:
+        working_directory: ~/ex_circleci
+        docker:
+            - image: circleci/python:3.7.7
+              environment:
+                PYTHONDONTWRITEBYTECODE: 1
+                PYTHONUNBUFFERED : 1
+                TZ: Asia/Tokyo
+
+commands:
+    chown_package:
+        description: "authorize to install dependency into packeage as circle ci user"
+        steps:
+            - run:
+                name: "change owner of package directory"
+                command: |
+                    sudo chown -R circleci:circleci /usr/local/bin
+                    sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+    restore_package:
+        description: "read cached packeage"
+        steps:
+            - restore_cache:
+                name: "Restore cache"
+                key: dependency-cache-{{ checksum "~/ex_circleci/requirements.txt"}}
+    pip_install:
+        description: "install package"
+        steps:
+            - run:
+                name: "Install package"
+                command: pip install -r ~/ex_circleci/requirements.txt
+    save_package:
+        description: "cache installed package"
+        steps:
+            - save_cache:
+                name: "Save cache"
+                key: dependency-cache-{{ checksum "~/ex_circleci/requirements.txt"}}
+                paths:
+                    - /usr/local/bin
+                    - /usr/local/bin/python3.7/site-packages
+    execute_test:
+        description: "run test"
+        steps:
+            - run:
+                name: "run test"
+                command: pytest ~/ex_circleci/tests/
+
+jobs:
+    build_and_test:
+        executor: code_test
+        steps:
+            - checkout
+            - chown_package
+            - restore_package
+            - pip_install
+            - save_package
+            - execute_test
+    
+workflows:
+    version: 2.1
+    test:
+        jobs:
+            - build_and_test
